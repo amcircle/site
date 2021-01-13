@@ -1,0 +1,26 @@
+bibliography:
+  - id: super
+    ref: >
+      @article{article,
+        author = {Arsenyev-Obraztsov, S and Volkov, E and Plusch, G},
+        year = {2019},
+        month = {11},
+        pages = {012053},
+        title = {Proposals on 3D parallel edge-preserving filtration for x-ray tomographic digital images of porous medium core plugs},
+        volume = {700},
+        journal = {IOP Conference Series: Materials Science and Engineering}
+      }
+  - id: super2
+    ref: >
+      @article{batchelor2019guidelines,
+        title={Guidelines for enhanced recovery after lung surgery: recommendations of the Enhanced Recovery After Surgery (ERAS{\textregistered}) Society and the European Society of Thoracic Surgeons (ESTS)},
+        author={Batchelor, Timothy JP and Rasburn, Neil J and Abdelnour-Berchtold, Etienne and Brunelli, Alessandro and Cerfolio, Robert J and Gonzalez, Michel and Ljungqvist, Olle and Petersen, Ren{\'e} H and Popescu, Wanda M and Slinger, Peter D and others},
+        journal={European journal of cardio-thoracic surgery},
+        volume={55},
+        number={1},
+        pages={91--115},
+        year={2019},
+        publisher={Oxford University Press}
+      }
+  - id: super3
+    ref: Q21972834

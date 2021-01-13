@@ -1,0 +1,16 @@
+$enable-responsive-font-sizes: true;
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import "../node_modules/nprogress/nprogress";
+
+#__next {
+  height: 100%!important;
+}
+
+pre {
+  margin: 0;
+}
+
+.text-content h2 {
+   @include font-size(2.5rem);
+}
