@@ -16,7 +16,6 @@ const ContentGrid = ({
     grid = grid ? grid : {xs: 1, sm: 2, lg: 3};
     if (onlyFeatured) content = content.filter(post => post.featured);
     if (limit) content = content.slice(0,limit);
-    console.log(content)
     const items = content.map((meta, index) => {
       return (
         <ContentCard

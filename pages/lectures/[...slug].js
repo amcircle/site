@@ -6,17 +6,14 @@ import withTranslate from 'components/hocs/withTranslate';
 
 import Link from 'next/link';
 import ContentGrid from 'components/blocks/ContentGrid';
-import SearchBlock from 'components/blocks/SearchBlock';
-import TextContent from 'components/blocks/TextContent';
-import ArticleHead from 'components/blocks/ArticleHead';
-import Logo from 'components/blocks/Logo';
-//import dateSortDesc from 'utils/date_st';
 import { makeAuthorsLinks } from 'components/blocks/ArticleHead';
 import { makeAuthorsString, makeAuthorsTitle } from 'utils/authors';
 
 import { getContent, getContentList, findInOtherLanguage } from 'cms/content';
 import { renderMdxServer } from 'utils/renderMdxServer';
 import { renderMdxClient } from 'utils/renderMdxClient';
+
+import LunaPage from 'components/layout/LunaPage';
 
 const textTranslations = {
   pageName: {
@@ -27,6 +24,14 @@ const textTranslations = {
     en: 'Lecturer',
     ru: 'Лектор'
   },
+  abstract: {
+    en: 'Abstract',
+    ru: 'Аннотация'
+  },
+  keywords: {
+    en: 'Keywords',
+    ru: 'Ключевые слова'
+  },
   authorsPluralEnding: {
     en: 's',
     ru: 'ы'
@@ -34,106 +39,40 @@ const textTranslations = {
   readMore: {
     en: 'Open',
     ru: 'Открыть'
-  },
-  label: {
-    image : {
-      en: 'Picture',
-      ru: 'Рисунок'
-    },
-    table: {
-      en: 'Table',
-      ru: 'Таблица'
-    },
-    code: {
-      en: 'Code',
-      ru: 'Листинг'
-    },
-    tocTitle: {
-      en: 'Contents',
-      ru: 'Содержимое'
-    },
-    bibliography: {
-      en: 'Bibliography',
-      ru: 'Библиография'
-    },
   }
 };
 
 const contentType = 'lectures';
 
-function Lectures({ source, meta, lang, otherLangLink, filePath, texts, contentList, isSubOpened, sub, contentTitle}) {
-  const authorsTitle = makeAuthorsTitle(meta.authors, lang, textTranslations);
-  const authorsString = makeAuthorsString(meta.authors, lang, textTranslations);
-  const keywords = (meta.keywords ? meta.keywords : []).concat(authorsString.split(', '));
-  const description = (meta.title ? meta.title + '; ' : '') +
-    (meta.description ? meta.description + '; ' : '') +
-    authorsTitle + ': ' +
-    authorsString;
+function Lectures(props) {
+  const { filePath, source, lang, contentList, texts } = props;
 
-  const label = {...textTranslations.label};
-  Object.keys(textTranslations.label).forEach(lKey => {
-    label[lKey] = textTranslations.label[lKey][lang];
-  });
-
-  const content = renderMdxClient({filePath, source, label});
+  const content = renderMdxClient({filePath, source, lang});
 
   return (
-    <Page
-      title={meta.title ? meta.title + ` | ${texts['pageName']}` : texts['pageName']}
-      description={description}
-      keywords={keywords}
-      ogImage={meta.coverImage ? meta.coverImage : null}
-      smallHeader={isSubOpened}
-      otherLangLink={otherLangLink}>
-      <h4 className='mx-auto my-5 text-center'>
-        {isSubOpened ? (
-          <div>
-            <Logo small={true} />
-            <Link href={`/${contentType}/${sub}`}>
-              <a>← {contentTitle}</a>
-            </Link>
-          </div>
-        ) : (
-          <Link href={`/${contentType}`}>
-            <a>← {texts['pageName']}</a>
+    <LunaPage {...props} contentType={contentType} textTranslations={textTranslations} content={content} afterContent={
+      <ContentGrid
+        content={contentList}
+        highlightFirst={false}
+        imageOnTop={true}
+        HeaderLink={linkProps => (
+          <Link href={linkProps.route}>
+            <a>{linkProps.children}</a>
           </Link>
         )}
-      </h4>
-      <div className='mb-5'>
-        <ArticleHead
-          title={meta.title}
-          authors={meta.authors}
-          lang={lang}
-          authorsTitle={authorsTitle}
-        />
-      </div>
-      <div>
-        <TextContent>
-          {content}
-          <ContentGrid
-            content={contentList}
-            highlightFirst={false}
-            imageOnTop={true}
-            HeaderLink={linkProps => (
-              <Link href={linkProps.route}>
-                <a>{linkProps.children}</a>
-              </Link>
-            )}
-            Link={linkProps => (
-              <Link href={linkProps.route}>
-                <a>{texts['readMore']} →</a>
-              </Link>
-            )}
-            Footer={footerProps => (
-              <small>
-                {makeAuthorsTitle(footerProps.meta.authors, lang, textTranslations)}:&nbsp;
-                {makeAuthorsLinks(footerProps.meta.authors, lang, textTranslations)}
-              </small>
-            )}
-          />
-        </TextContent>
-      </div>
-    </Page>
+        Link={linkProps => (
+          <Link href={linkProps.route}>
+            <a>{texts['readMore']} →</a>
+          </Link>
+        )}
+        Footer={footerProps => (
+          <small>
+            {makeAuthorsTitle(footerProps.meta.authors, lang, textTranslations)}:&nbsp;
+            {makeAuthorsLinks(footerProps.meta.authors, lang, textTranslations)}
+          </small>
+        )}
+      />
+    } />
   );
 }
 
@@ -159,12 +98,7 @@ export async function getStaticProps(context) {
   const isSubOpened = contextParams.slug.length > 1;
   const contentTitle = isSubOpened ? getContent({contentType, locale: context.locale, slug: [contextParams.slug[0]]}).data['title'] : null;
 
-  const label = {...textTranslations.label};
-  Object.keys(textTranslations.label).forEach(lKey => {
-    label[lKey] = textTranslations.label[lKey][contextParams.locale];
-  });
-
-  const { mdxSource, meta } = await renderMdxServer({filePath, data, content, label});
+  const { mdxSource, meta } = await renderMdxServer({filePath, data, content, lang: context.locale});
 
   const otherLangLink = findInOtherLanguage(contextParams);
 

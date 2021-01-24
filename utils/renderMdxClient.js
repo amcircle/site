@@ -8,9 +8,9 @@ const Plot = dynamic(
   { ssr: false}
 );
 
-export function renderMdxClient({filePath, source, label}) {
+export function renderMdxClient({filePath, source, lang}) {
 
-  const customComponents = getCustomComponents(filePath, label, Plot);
+  const customComponents = getCustomComponents(filePath, lang, Plot);
 
   const {
     components

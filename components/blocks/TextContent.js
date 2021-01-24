@@ -9,6 +9,13 @@ const TextContent = props => {
         div {
           max-width: 662px !important;
         }
+        div :global(p) {
+          line-height: 2rem;
+        }
+        div :global(.math) {
+          page-break-inside: avoid;
+          page-break-before: avoid;
+        }
       `}</style>
     </div>
   );

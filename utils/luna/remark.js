@@ -48,8 +48,6 @@ function prepareToc(headersList) {
     headerTree(tocPointer, header);
   });
 
-  console.log('toc', toc)
-
   return toc;
 }
 
@@ -128,7 +126,6 @@ function remarkLuna({bibliography, bibFormatter, bibSort}) {
 
       let headingValue = '';
       visit(node, 'text', textNode => {
-        console.log('text', textNode)
         headingValue += textNode.value;
       });
 

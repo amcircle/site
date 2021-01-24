@@ -1,7 +1,6 @@
 import { loadImports } from 'cms/content';
 
 export async function fetcher({filePath, file, type}) {
-  console.log('fetcher file type', file, type);
   if (typeof file !== 'string') return file;
   if (file.includes('http')) {
     console.log('includes http')

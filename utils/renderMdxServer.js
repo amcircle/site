@@ -6,8 +6,8 @@ import rehypeLuna from './luna/rehype';
 import { fetcher } from './contentImportsFetcher';
 import { getCustomComponents } from './customLunaComponents';
 
-export async function renderMdxServer({filePath, data, content, label}) {
-  const customComponents = getCustomComponents(filePath, label);
+export async function renderMdxServer({filePath, data, content, lang}) {
+  const customComponents = getCustomComponents(filePath, lang);
   const { components } = lunaComponents({ components: customComponents });
 
   const meta = {...data};

@@ -1,8 +1,45 @@
 import path from 'path';
+import Link from 'next/link';
+import genSiteLink from 'cms/genSiteLink';
 
-function transformUrl(page, url) {
-  const fromFolder = path.join('/', path.dirname(page));
-  return path.join(fromFolder, url);
+const textTranslations = {
+  image : {
+    en: 'Picture',
+    ru: 'Рисунок'
+  },
+  table: {
+    en: 'Table',
+    ru: 'Таблица'
+  },
+  code: {
+    en: 'Code',
+    ru: 'Листинг'
+  },
+  tocTitle: {
+    en: 'Contents',
+    ru: 'Содержимое'
+  },
+  bibliography: {
+    en: 'Bibliography',
+    ru: 'Библиография'
+  },
+};
+
+function labels(lang) {
+  const label = {...textTranslations};
+  Object.keys(textTranslations).forEach(lKey => {
+    label[lKey] = textTranslations[lKey][lang];
+  });
+  return label;
+}
+
+function transformUrl(page, url, isMdx = false) {
+  if (isMdx) {
+    return genSiteLink(page, url);
+  } else {
+    const fromFolder = path.join('/', path.dirname(page));
+    return path.join(fromFolder, url);
+  }
 }
 
 function createNestedList(tree) {
@@ -21,12 +58,11 @@ const Bibliography = props => {
       <ol>
         {props.bibrefs.map( (ref, i) => {
           const refData = JSON.parse(ref.ref)[0];
-          console.log(refData.issued['date-parts']);
           const authors = refData.author.map(a => a.family + (a.given ? ' ' + a.given : '')).join(', ');
           const refDate = refData.issued ? '(' + refData.issued['date-parts'].map(d => d.reverse().join('.')).join(', ') + ')' : '';
           return (
             <li key={i} className='mb-3'><a name={ref.anchor} />
-              {refDate} <a
+              <small>{refDate}</small> <a
                 target='_blank'
                 href={`https://scholar.google.com/scholar?q=${encodeURI(authors+'. '+refData.title)}`}>
                   {refData.title}
@@ -50,10 +86,12 @@ const Bibliography = props => {
 const mediaSpacer = 'my-5';
 const mediaCaptionSpacer = 'mt-n4 mb-5';
 
-export function getCustomComponents(filePath, label, Plot) {
+export function getCustomComponents(filePath, lang, Plot) {
+  const label = labels(lang);
   return {
     img: (props) => {
-      return <div className={mediaSpacer}><img src={transformUrl(filePath, props.src)} alt={props.alt} /></div>
+      const transformedUrl = transformUrl(filePath, props.src);
+      return <div className={mediaSpacer}><a href={transformedUrl} target='_blank'><img src={transformedUrl} alt={props.alt} /></a></div>
     },
     code: (props) => <code {...{ ...props, ...{'className': `${props.className} ${mediaSpacer}`} }} />,
     ref: ({children, id, caption, type = 'generic'}, metaData) => {
@@ -143,6 +181,16 @@ export function getCustomComponents(filePath, label, Plot) {
       } else {
         return <div {...props} />;
       }
+    },
+    a: (props) => {
+      if (props.href.includes('./') || props.href.includes('../')) {
+        return <a {...{ ...props, ...{'href': transformUrl(filePath, props.href)} }}>{props.children}</a>;
+      } else {
+        return <a {...props} />;
+      }
+    },
+    link: (props) => {
+      return <Link href={transformUrl(filePath, props.href, true)} locale={false}><a>{props.children}</a></Link>;
     }
   };
 }
